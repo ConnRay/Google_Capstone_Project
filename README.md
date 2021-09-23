@@ -1,8 +1,8 @@
 # Here is my capstone project for the Google Data Analytics Certificate.
- The GoogleCapstoneNotes explains my thinking process throughout this project <br />
+ The GoogleCapstoneNotes explains my thinking process throughout this project. <br />
  The Exploration, Cleaning and Processing all happened in the cycstic_process_script.ipynb notebook. <br />
  Visualations were done in Tableau and python using matplotlib. <br />
- The data used for this project was too large to be pushed but can be found at https://divvy-tripdata.s3.amazonaws.com/index.html <br />
+ The data used for this project was too large to be pushed but can be found at https://divvy-tripdata.s3.amazonaws.com/index.html. <br />
  The datasets used were:  
  202009-divvy-tripdata.zip <br />
  202010-divvy-tripdata.zip	<br />
