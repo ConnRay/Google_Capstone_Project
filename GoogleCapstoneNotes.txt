@@ -1,0 +1,112 @@
+Google Capstone Notes:
+
+I will be completing the Cyclistic Problem
+
+The question I need to answer:
+1. How do annual members and casual riders use Cyclistic bikes differently?
+
+Ask Phase:
+	Definitions:
+	- Casual Riders: "Customers who purchase single-ride or full-day passes"
+	- Annual Members: "Customers who purchase annual memberships are Cyclistic members"
+	- Categories of uses: The data set doesnt define different categories of use meaning I will not be able to with determine with certainity what the user was using the bike for (ie lesiure, exercise, transportation, etc). 
+	
+	Questions to drive my analysis:
+ 	- Trip duration (in time)
+	- Trip distance (in miles)
+	- Trip frequency (% of trips each rider type made up of the whole)
+	- Which style of bike the cutomer used.
+	- Are there trends in the time of year related to annual and casual rides
+	- Are there trends in the time of week related to annual and casual rides
+
+	Business Task Statement: Over a twelve month period how do casual riders use Cyclistic's services compared to annual members.
+
+Prepare:
+	- I will be using python for the duration of this project 
+	- Prepare Notes are associated with the CyclisticExploration.ipynb Notebook
+
+	Columns:
+		-ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, end_station_name, end_station_id, start_lat, start_lng, end_lat, end_lng, member_casual
+		
+	- I have two options here to start out with. Create a process to explore the dataset, identify problems, and manipulate data into a useful form for my questions for each dataset OR combine all 12 datasets into 1 and do this all in one pass through
+	- I will attempt to do this in one giant dataset I believe it will be easier for me to conceptualize, clean, manipulate, and finally analyze.
+	- If this is giant dataset becomes too slow to effectively do anything with then I will then analyze each month's dataset seperately.
+	- Datasets were successfully combined
+	- For all intents and purposes the prepare phase is complete... I have all the relevant data saved, exported to my notebook, and have created a comprehensive dataframe ready for cleaning and manipulation!
+
+Clean:
+	- Will also be found in the CyclisticExploration.ipynb Notebook
+	- Lets remove any duplicates 
+	- Now lets evaluate nulls in the dataset...
+	- running cyclstic_data.shape[0] returns every row in the dataframe and we can see 4913072 rows
+	- running cyclstic_data.count() returns each columns rows without nulls we can see that the following rows have less than 4913072 rows and thus some nans in them
+		start_station_name    4463027
+		start_station_id      4462501
+		end_station_name      4421692
+		end_station_id        4421308
+		end_lat               4908057
+		end_lng               4908057
+	- So The station name and ids arent important to my analysis... however according to sample R script provided by google "The dataframe includes a few hundred entries when bikes were taken out of docks and checked for quality by Divvy..."
+	- This is denoted by start_station_name == "HQ QR"
+	- I was simply going to create a new dataframe simply ignoring station names and would have run into inaccuracies... I need to make sure when working future projects I consider cases that introduce "bad" data
+	- So we are going to remove all cases with a nan (since we have an enough data as is) then remove rows with the HQ QR condition
+	- No rows with HQ QR found
+	- created and renamed columns for new dataframe
+	- verify data types for each column
+	- lets start by typecasting the start and end columns as dates
+	- object is returned for string types while this isnt certainly as object is also returned with the columns of mixed datatypes we will operate under that assumption unless an error is thrown
+	- now lets verify that the membership names are consistent 
+	- It is fantastic... this dataset appears to naturally be pretty clean..
+	- Now we need to start creating the columns with the useful information to our questions
+	- Lets start by getting the time of trips creating a column for time of trip named trip_time
+	- next lets remove any negative times
+	- only 5000+ rows were negative and given the size of this dataset we can simply remove those cases
+	- lets create the distance row this will require a function to get kilometers from lat and lon values
+	- this is taking a long time not ideal for running this function more than one time in the future I may need to research how to apply formulas more efficently
+	- took way too long need to get clever
+	- function I'm using for conversions that I need to modify
+		#def distance(lat1, lon1, lat2, lon2):
+		#    radius = 6371 # km
+		#
+		#    dlat = math.radians(lat2-lat1)
+		#    dlon = math.radians(lon2-lon1)
+		#    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+		#        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+		#    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+		#    d = radius * c
+
+		#    return d
+	- got it to work very happy about that
+	- check for negative distances and if still valid remove them
+	- no negative distances
+	- create a day of the week column
+	- create month name column
+	- cleaning is done
+
+Analyze:
+	get the mean, median, max and min for trip time by membership type
+	- we got some absurd numbers for this such as a max trip time of 38 days and a min of 1 second
+	- need to go back through and clear outliers we will say any trip that lasts < 1 minute and any trip that is > 1 day
+	- filtering outlier does make the min and max useless though so we need to take those out
+	- get the mean, median, max and min for trip distance by membership type
+	- The rest of the questions can be answered by creating visualizations which is what I'm going to do
+
+Share:
+	- Create all the necessary visuals
+	- Start by total percentage of riders over the entire year, then by month then day of week
+	- Percentage of riders doesnt look great but lets keep going I actually dont think this is necessary if I were making a report I could just discuss the % it doesnt make for a good chart and the other ones convey the information pretty good
+	- Next duration vs rider types and distance vs rider types
+	- Duration is a little tricky because its saved as a string in tableau... May need to go to script and change this or there might be a way to fix this in tableau itself
+	- Luckily I kept the start and end times in the data sheet and used the forumal AVG(DATEDIFF('minutes',[start_time], [end_time])) to calculate the average difference and get the time in minutes
+	- SUM(INT(CONTAINS([Bike Type],"docked_bike")))
+	- There are substantial problems with getting a pie chart of the different bike types in tableau so I am going to make a pie chart in python for that one.
+	- This project is now complete!
+
+Analysis:
+	- Quick Notes:
+		- Both the causal and member riders prefer riding in the summer months. Casual riders make up a slim majority in the summer months. Members make up a large majority in the winter
+		- Member riders stay about consitent throughout the week making the majority on week days. Casuals prefer the weekend where there numbers increase and make up the majority
+		- Average trip distance is very similar for both rider types, however causals ride longer than members.
+		- Both members and casuals have classic bikes as the most used bike type by group however for members this is the majority of all bikes used where as in casuals the electric and docked bikes make up a slim majority
+
+
